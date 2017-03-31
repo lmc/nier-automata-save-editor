@@ -7,27 +7,109 @@
 <html lang="en" dir="ltr" itemscope itemtype="http://schema.org/Article">
 <head>
   <meta charset="utf-8">
+  <script src="jquery.js"></script>
+  <script src="bootstrap.js"></script>
   <script src="src/app.js"></script>
+  <link rel="stylesheet" href="bootstrap.css">
+  <link rel="stylesheet" href="bootstrap-theme.css">
 </head>
 <body>
 
-<input type="file" id="file" name="files" />
+
+<div class="container">
+  <div class="row">
+    <p></p>
+  </div>
+
+  <div class="row">
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+      <li role="presentation" class="active"><a href="#load" aria-controls="load" role="tab" data-toggle="tab">Load</a></li>
+      <li role="presentation"><a href="#edit" aria-controls="edit" role="tab" data-toggle="tab">Edit</a></li>
+      <li role="presentation"><a href="#save" aria-controls="save" role="tab" data-toggle="tab">Save</a></li>
+    </ul>
+
+    <script type="text/javascript">
+      $('.nav.nav-tabs a').click(function (e) {
+        e.preventDefault()
+        $(this).tab('show')
+      })
+    </script>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+
+      <div role="tabpanel" class="tab-pane active" id="load">
+        
+        <div class="jumbotron">
+          <p>
+            <label class="btn btn-default btn-file">
+              Browse <input type="file" id="file" name="files" style="display: none;">
+            </label>
+          </p>
+        </div>
+
+      </div>
+
+
+      <div role="tabpanel" class="tab-pane" id="edit">
+        
+        <form id="form"  class="form-inline">
+          <table class="table table-border table-striped">
+            <thead>
+              <tr>
+                <th class="col-id">ID</th>
+                <th class="col-item">Item</th>
+                <th class="col-group">Group</th>
+                <th class="col-level">Level</th>
+                <th class="col-item">Slots</th>
+                <th class="col-5">-</th>
+                <th class="col-6">-</th>
+                <th class="col-7">-</th>
+                <th class="col-8">-</th>
+                <th class="col-9">-</th>
+                <th class="col-10">-</th>
+                <th class="col-11">-</th>
+              </tr>
+            </thead>
+            <tbody id="tbody">
+              
+            </tbody>
+          </table>
+        </form>
+
+      </div>
+
+
+      <div role="tabpanel" class="tab-pane" id="save">
+        
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+<div class="panel panel-default">
+  <div class="panel-body">
+      
+
+
+  </div>
+</div>
+
+
+
+<!-- <input type="file" id="file" name="files" /> -->
 <pre id="output"></pre>
 
-<form id="form">
-<table border="1">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Item</th>
-      <th>Slots</th>
-    </tr>
-  </thead>
-  <tbody id="tbody">
-    
-  </tbody>
-</table>
-</form>
+
 
 </body>
 </html>

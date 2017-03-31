@@ -1,6 +1,10 @@
 class @App
   constructor: () ->
+    console.log("app constructor")
     document.getElementById('file').addEventListener('change', @file_change, false)
+
+    $('a[href="#save"').on("click",@save_tab_click)
+
     @output = document.getElementById('output')
     @tbody = document.getElementById('tbody')
 
@@ -102,26 +106,32 @@ class @App
   }
 
   file_change: (evt) =>
+    @tbody.innerHTML = ""
+    @nav_tab('edit').tab('show')
+
     files = evt.target.files
     file = files[0]
-    blob = file.slice(@CHIPS_OFFSET,@CHIPS_OFFSET+(@CHIPS_SIZE*@CHIPS_COUNT))
+    @blob = file
+    # @blob = file.slice(@CHIPS_OFFSET,@CHIPS_OFFSET+(@CHIPS_SIZE*@CHIPS_COUNT))
 
-    reader = new FileReader
-    reader.onload = @reader_onload
-    reader.readAsArrayBuffer(blob)
+    @reader = new FileReader
+    @reader.onload = @reader_onload
+    @reader.readAsArrayBuffer(@blob)
 
   reader_onload: (event) =>
-    view = new DataView(event.target.result)
+    @view = new DataView(event.target.result)
 
     chips = []
     for i in [0...@CHIPS_COUNT]
       j = 0
       ints = []
       while j < @CHIPS_SIZE
-        ints.push(view.getInt32((@CHIPS_SIZE * i) + j,true))
+        ints.push(@view.getInt32(@CHIPS_OFFSET + (@CHIPS_SIZE * i) + j,true))
         j += 4
       chips.push(ints)
+    @chips = chips
 
+    @tbody.innerHTML = ""
     for ints,idx in chips
       @tbody.innerHTML += @row_html(ints,idx)
 
@@ -129,14 +139,42 @@ class @App
     """
       <tr id="chip_#{index}">
         <td>
-          <input name="chip[#{index}][id]" value="#{chip[0]}">
+          <input name="chip[#{index}][id]" value="#{chip[0]}" class="form-control" size="3">
         </td>
         <td>
-          <select name="chip[#{index}][chip]" class="chip">#{@chip_options_html(chip)}</select>
+          <select name="chip[#{index}][chip]" class="chip form-control">#{@chip_options_html(chip)}</select>
         </td>
         <td>
-          <input name="chip[#{index}][slots]" value="#{chip[4]}">
+          <input name="chip[#{index}][2]" value="#{chip[2]}" class="form-control" size="3">
         </td>
+        <td>
+          <input name="chip[#{index}][3]" value="#{chip[3]}" class="form-control" size="3">
+        </td>
+        <td>
+          <input name="chip[#{index}][slots]" value="#{chip[4]}" class="form-control" size="3">
+        </td>
+        <td>
+          <input name="chip[#{index}][5]" value="#{chip[5]}" class="form-control" size="3">
+        </td>
+        <td>
+          <input name="chip[#{index}][6]" value="#{chip[6]}" class="form-control" size="3">
+        </td>
+        <td>
+          <input name="chip[#{index}][7]" value="#{chip[7]}" class="form-control" size="3">
+        </td>
+        <td>
+          <input name="chip[#{index}][8]" value="#{chip[8]}" class="form-control" size="3">
+        </td>
+        <td>
+          <input name="chip[#{index}][9]" value="#{chip[9]}" class="form-control" size="3">
+        </td>
+        <td>
+          <input name="chip[#{index}][10]" value="#{chip[10]}" class="form-control" size="3">
+        </td>
+        <td>
+          <input name="chip[#{index}][11]" value="#{chip[11]}" class="form-control" size="3">
+        </td>
+
       </tr>
     """
 
@@ -145,6 +183,15 @@ class @App
     for chip_id,name of @CHIP_IDS
       html += "<option value='#{chip_id}' #{if parseInt(chip_id) == parseInt(chip[1]) then ' selected' else ''}>#{name}</option>\n"
     html
+
+  nav_tabs: =>
+    $('.nav.nav-tabs a')
+
+  nav_tab: (id) =>
+    @nav_tabs().filter('[href="#'+id+'"]')
+
+  save_tab_click: (event) =>
+    # generate save link
 
 window.onload = ->
   window.app = new App

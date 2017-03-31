@@ -4,6 +4,12 @@
   this.App = (function() {
 
     function App() {
+      this.save_tab_click = __bind(this.save_tab_click, this);
+
+      this.nav_tab = __bind(this.nav_tab, this);
+
+      this.nav_tabs = __bind(this.nav_tabs, this);
+
       this.chip_options_html = __bind(this.chip_options_html, this);
 
       this.row_html = __bind(this.row_html, this);
@@ -11,7 +17,9 @@
       this.reader_onload = __bind(this.reader_onload, this);
 
       this.file_change = __bind(this.file_change, this);
+      console.log("app constructor");
       document.getElementById('file').addEventListener('change', this.file_change, false);
+      $('a[href="#save"').on("click", this.save_tab_click);
       this.output = document.getElementById('output');
       this.tbody = document.getElementById('tbody');
     }
@@ -101,28 +109,32 @@
     };
 
     App.prototype.file_change = function(evt) {
-      var blob, file, files, reader;
+      var file, files;
+      this.tbody.innerHTML = "";
+      this.nav_tab('edit').tab('show');
       files = evt.target.files;
       file = files[0];
-      blob = file.slice(this.CHIPS_OFFSET, this.CHIPS_OFFSET + (this.CHIPS_SIZE * this.CHIPS_COUNT));
-      reader = new FileReader;
-      reader.onload = this.reader_onload;
-      return reader.readAsArrayBuffer(blob);
+      this.blob = file;
+      this.reader = new FileReader;
+      this.reader.onload = this.reader_onload;
+      return this.reader.readAsArrayBuffer(this.blob);
     };
 
     App.prototype.reader_onload = function(event) {
-      var chips, i, idx, ints, j, view, _i, _j, _len, _ref, _results;
-      view = new DataView(event.target.result);
+      var chips, i, idx, ints, j, _i, _j, _len, _ref, _results;
+      this.view = new DataView(event.target.result);
       chips = [];
       for (i = _i = 0, _ref = this.CHIPS_COUNT; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
         j = 0;
         ints = [];
         while (j < this.CHIPS_SIZE) {
-          ints.push(view.getInt32((this.CHIPS_SIZE * i) + j, true));
+          ints.push(this.view.getInt32(this.CHIPS_OFFSET + (this.CHIPS_SIZE * i) + j, true));
           j += 4;
         }
         chips.push(ints);
       }
+      this.chips = chips;
+      this.tbody.innerHTML = "";
       _results = [];
       for (idx = _j = 0, _len = chips.length; _j < _len; idx = ++_j) {
         ints = chips[idx];
@@ -132,7 +144,7 @@
     };
 
     App.prototype.row_html = function(chip, index) {
-      return "<tr id=\"chip_" + index + "\">\n  <td>\n    <input name=\"chip[" + index + "][id]\" value=\"" + chip[0] + "\">\n  </td>\n  <td>\n    <select name=\"chip[" + index + "][chip]\" class=\"chip\">" + (this.chip_options_html(chip)) + "</select>\n  </td>\n  <td>\n    <input name=\"chip[" + index + "][slots]\" value=\"" + chip[4] + "\">\n  </td>\n</tr>";
+      return "<tr id=\"chip_" + index + "\">\n  <td>\n    <input name=\"chip[" + index + "][id]\" value=\"" + chip[0] + "\" class=\"form-control\" size=\"3\">\n  </td>\n  <td>\n    <select name=\"chip[" + index + "][chip]\" class=\"chip form-control\">" + (this.chip_options_html(chip)) + "</select>\n  </td>\n  <td>\n    <input name=\"chip[" + index + "][2]\" value=\"" + chip[2] + "\" class=\"form-control\" size=\"3\">\n  </td>\n  <td>\n    <input name=\"chip[" + index + "][3]\" value=\"" + chip[3] + "\" class=\"form-control\" size=\"3\">\n  </td>\n  <td>\n    <input name=\"chip[" + index + "][slots]\" value=\"" + chip[4] + "\" class=\"form-control\" size=\"3\">\n  </td>\n  <td>\n    <input name=\"chip[" + index + "][5]\" value=\"" + chip[5] + "\" class=\"form-control\" size=\"3\">\n  </td>\n  <td>\n    <input name=\"chip[" + index + "][6]\" value=\"" + chip[6] + "\" class=\"form-control\" size=\"3\">\n  </td>\n  <td>\n    <input name=\"chip[" + index + "][7]\" value=\"" + chip[7] + "\" class=\"form-control\" size=\"3\">\n  </td>\n  <td>\n    <input name=\"chip[" + index + "][8]\" value=\"" + chip[8] + "\" class=\"form-control\" size=\"3\">\n  </td>\n  <td>\n    <input name=\"chip[" + index + "][9]\" value=\"" + chip[9] + "\" class=\"form-control\" size=\"3\">\n  </td>\n  <td>\n    <input name=\"chip[" + index + "][10]\" value=\"" + chip[10] + "\" class=\"form-control\" size=\"3\">\n  </td>\n  <td>\n    <input name=\"chip[" + index + "][11]\" value=\"" + chip[11] + "\" class=\"form-control\" size=\"3\">\n  </td>\n\n</tr>";
     };
 
     App.prototype.chip_options_html = function(chip) {
@@ -145,6 +157,16 @@
       }
       return html;
     };
+
+    App.prototype.nav_tabs = function() {
+      return $('.nav.nav-tabs a');
+    };
+
+    App.prototype.nav_tab = function(id) {
+      return this.nav_tabs().filter('[href="#' + id + '"]');
+    };
+
+    App.prototype.save_tab_click = function(event) {};
 
     return App;
 
