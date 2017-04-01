@@ -1,9 +1,14 @@
 (function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   this.App = (function() {
 
     function App() {
+      this.auto_chip_id = __bind(this.auto_chip_id, this);
+
+      this.chip_input_change = __bind(this.chip_input_change, this);
+
       this.save_tab_click = __bind(this.save_tab_click, this);
 
       this.nav_tab = __bind(this.nav_tab, this);
@@ -21,7 +26,14 @@
       this.file_change = __bind(this.file_change, this);
       console.log("app constructor");
       document.getElementById('file').addEventListener('change', this.file_change, false);
+      $('.nav.nav-tabs a').click(function(e) {
+        e.preventDefault();
+        return $(this).tab('show');
+      });
       $('a[href="#save"').on("click", this.save_tab_click);
+      $('#chip_form').on("change input", ".chip_type", this.chip_input_change);
+      $('#chip_form').on("change input", ".chip_level", this.chip_input_change);
+      $('#chip_form').on("change input", ".chip_slots", this.chip_input_change);
       this.output = document.getElementById('output');
       this.tbody = document.getElementById('tbody');
     }
@@ -239,7 +251,7 @@
     };
 
     App.prototype.row_html = function(chip, index) {
-      return "<tr id=\"chip_" + index + "\">\n  <td>\n    <select name=\"chip[" + index + "][type]\" class=\"form-control\">" + (this.chip_options_html(chip)) + "</select>\n  </td>\n  <td>\n    <input name=\"chip[" + index + "][level]\" value=\"" + chip[3] + "\" class=\"form-control\" size=\"3\">\n  </td>\n  <td>\n    <input name=\"chip[" + index + "][slots]\" value=\"" + chip[4] + "\" class=\"form-control\" size=\"3\">\n  </td>\n  <td>\n    <input name=\"chip[" + index + "][raw]\" value=\"" + (chip.join(", ")) + "\" id=\"input_chip_" + index + "\" class=\"form-control\" size=\"50\" style=\"font-family: monospace;\">\n  </td>\n</tr>";
+      return "<tr id=\"chip_" + index + "\">\n  <td>\n    <select name=\"chip[" + index + "][type]\" class=\"form-control chip_type\">" + (this.chip_options_html(chip)) + "</select>\n  </td>\n  <td>\n    <input name=\"chip[" + index + "][level]\" value=\"" + chip[3] + "\" class=\"form-control chip_level\" size=\"3\">\n  </td>\n  <td>\n    <input name=\"chip[" + index + "][slots]\" value=\"" + chip[4] + "\" class=\"form-control chip_slots\" size=\"3\">\n  </td>\n  <td>\n    <input name=\"chip[" + index + "][raw]\" value=\"" + (chip.join(", ")) + "\" id=\"input_chip_" + index + "\" class=\"form-control chip_raw\" size=\"50\" style=\"font-family: monospace;\">\n  </td>\n</tr>";
     };
 
     App.prototype.write_form_values_to_blob = function() {
@@ -247,7 +259,6 @@
       for (i = _i = 0, _ref = this.CHIPS_COUNT; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
         input = $("#input_chip_" + i);
         values = input.val().split(/, ?/);
-        debugger;
         for (j = _j = 0, _len = values.length; _j < _len; j = ++_j) {
           value = values[j];
           value = parseInt(value);
@@ -281,7 +292,50 @@
       return this.nav_tabs().filter('[href="#' + id + '"]');
     };
 
-    App.prototype.save_tab_click = function(event) {};
+    App.prototype.save_tab_click = function(event) {
+      if (this.blob) {
+        return this.write_form_values_to_blob();
+      }
+    };
+
+    App.prototype.chip_input_change = function(event) {
+      var category, chip_id, level, raw_input, row, slots, values;
+      row = $(event.target).closest("tr");
+      raw_input = row.find(".chip_raw");
+      category = parseInt(row.find(".chip_type").val()) || 3001;
+      level = parseInt(row.find(".chip_level").val()) || 0;
+      slots = parseInt(row.find(".chip_slots").val()) || 1;
+      chip_id = this.CATEGORIES_TO_BASE_ITEM_IDS[category];
+      chip_id += level;
+      values = raw_input.val().split(/, ?/);
+      if (parseInt(values[0]) === -1) {
+        values[0] = this.auto_chip_id();
+      }
+      values[1] = chip_id;
+      values[2] = category;
+      values[3] = level;
+      values[4] = slots;
+      return raw_input.val(values.join(", "));
+    };
+
+    App.prototype.auto_chip_id = function() {
+      var i, id, input, new_id, used_ids, _i, _ref;
+      used_ids = [];
+      for (i = _i = 0, _ref = this.CHIPS_COUNT; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+        input = $("#input_chip_" + i);
+        id = parseInt(input.val().split(/, ?/)[0]);
+        if (id !== -1) {
+          used_ids.push(id);
+        }
+      }
+      new_id = -1;
+      while (true) {
+        new_id = parseInt(Math.random() * this.CHIPS_COUNT);
+        if (__indexOf.call(used_ids, new_id) < 0) {
+          return new_id;
+        }
+      }
+    };
 
     return App;
 

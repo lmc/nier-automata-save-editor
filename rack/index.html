@@ -7,11 +7,11 @@
 <html lang="en" dir="ltr" itemscope itemtype="http://schema.org/Article">
 <head>
   <meta charset="utf-8">
-  <script src="jquery.js"></script>
-  <script src="bootstrap.js"></script>
-  <script src="src/app.js"></script>
-  <link rel="stylesheet" href="bootstrap.css">
-  <link rel="stylesheet" href="bootstrap-theme.css">
+  <script src="./jquery.js"></script>
+  <script src="./bootstrap.js"></script>
+  <script src="./src/app.js"></script>
+  <link rel="stylesheet" href="./bootstrap.css">
+  <link rel="stylesheet" href="./bootstrap-theme.css">
 </head>
 <body>
 
@@ -30,24 +30,19 @@
       <li role="presentation"><a href="#save" aria-controls="save" role="tab" data-toggle="tab">Save</a></li>
     </ul>
 
-    <script type="text/javascript">
-      $('.nav.nav-tabs a').click(function (e) {
-        e.preventDefault()
-        $(this).tab('show')
-      })
-    </script>
-
     <!-- Tab panes -->
     <div class="tab-content">
 
       <div role="tabpanel" class="tab-pane active" id="load">
         
-        <div class="jumbotron">
-          <p>
+        <div class="container">
+          <div class="row"><p></p></div>
+          <div class="row">
             <label class="btn btn-default btn-file">
               Browse <input type="file" id="file" name="files" style="display: none;">
             </label>
-          </p>
+          </div>
+          <div class="row"><p></p></div>
         </div>
 
       </div>
@@ -55,7 +50,7 @@
 
       <div role="tabpanel" class="tab-pane" id="edit">
         
-        <form id="form"  class="form-inline">
+        <form id="chip_form"  class="form-inline">
           <table class="table table-border table-striped">
             <thead>
               <tr>
@@ -76,7 +71,13 @@
 
       <div role="tabpanel" class="tab-pane" id="save">
         
-        <a id="save_link" href="#">Download</a>
+        <div class="container">
+          <div class="row"><p></p></div>
+          <div class="row">
+            <a id="save_link" class="btn btn-default btn-file" href="#">Download</a>
+          </div>
+          <div class="row"><p></p></div>
+        </div>
 
       </div>
 
@@ -84,25 +85,6 @@
 
   </div>
 </div>
-
-
-
-
-
-<div class="panel panel-default">
-  <div class="panel-body">
-      
-
-
-  </div>
-</div>
-
-
-
-<!-- <input type="file" id="file" name="files" /> -->
-<pre id="output"></pre>
-
-
 
 </body>
 </html>

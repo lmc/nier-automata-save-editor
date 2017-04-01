@@ -3,7 +3,14 @@ class @App
     console.log("app constructor")
     document.getElementById('file').addEventListener('change', @file_change, false)
 
+    $('.nav.nav-tabs a').click( (e) ->
+      e.preventDefault()
+      $(this).tab('show')
+    )
     $('a[href="#save"').on("click",@save_tab_click)
+    $('#chip_form').on("change input",".chip_type", @chip_input_change)
+    $('#chip_form').on("change input",".chip_level",@chip_input_change)
+    $('#chip_form').on("change input",".chip_slots",@chip_input_change)
 
     @output = document.getElementById('output')
     @tbody = document.getElementById('tbody')
@@ -223,16 +230,16 @@ class @App
     """
       <tr id="chip_#{index}">
         <td>
-          <select name="chip[#{index}][type]" class="form-control">#{@chip_options_html(chip)}</select>
+          <select name="chip[#{index}][type]" class="form-control chip_type">#{@chip_options_html(chip)}</select>
         </td>
         <td>
-          <input name="chip[#{index}][level]" value="#{chip[3]}" class="form-control" size="3">
+          <input name="chip[#{index}][level]" value="#{chip[3]}" class="form-control chip_level" size="3">
         </td>
         <td>
-          <input name="chip[#{index}][slots]" value="#{chip[4]}" class="form-control" size="3">
+          <input name="chip[#{index}][slots]" value="#{chip[4]}" class="form-control chip_slots" size="3">
         </td>
         <td>
-          <input name="chip[#{index}][raw]" value="#{chip.join(", ")}" id="input_chip_#{index}" class="form-control" size="50" style="font-family: monospace;">
+          <input name="chip[#{index}][raw]" value="#{chip.join(", ")}" id="input_chip_#{index}" class="form-control chip_raw" size="50" style="font-family: monospace;">
         </td>
       </tr>
     """
@@ -241,7 +248,6 @@ class @App
     for i in [0...@CHIPS_COUNT]
       input = $("#input_chip_#{i}")
       values = input.val().split(/, ?/)
-      debugger
       for value,j in values
         value = parseInt(value)
         @view.setInt32(@CHIPS_OFFSET + (@CHIPS_SIZE * i) + (j * 4),value,true)
@@ -265,7 +271,40 @@ class @App
     @nav_tabs().filter('[href="#'+id+'"]')
 
   save_tab_click: (event) =>
-    # generate save link
+    if @blob
+      @write_form_values_to_blob()
+
+  chip_input_change: (event) =>
+    row = $(event.target).closest("tr")
+    raw_input = row.find(".chip_raw")
+    category = parseInt( row.find(".chip_type" ).val() ) || 3001
+    level    = parseInt( row.find(".chip_level").val() ) || 0
+    slots    = parseInt( row.find(".chip_slots").val() ) || 1
+    chip_id = @CATEGORIES_TO_BASE_ITEM_IDS[ category ]
+    chip_id += level
+    values = raw_input.val().split(/, ?/)
+    if parseInt(values[0]) == -1
+      values[0] = @auto_chip_id()
+    values[1] = chip_id
+    values[2] = category
+    values[3] = level
+    values[4] = slots
+    raw_input.val( values.join(", ") )
+
+  auto_chip_id: =>
+    used_ids = []
+    for i in [0...@CHIPS_COUNT]
+      input = $("#input_chip_#{i}")
+      id = parseInt( input.val().split(/, ?/)[0] )
+      if id != -1
+        used_ids.push(id)
+
+    new_id = -1
+    while true
+      new_id = parseInt(Math.random() * @CHIPS_COUNT)
+      if new_id not in used_ids
+        return new_id
+
 
 window.onload = ->
   window.app = new App
